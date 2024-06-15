@@ -25,5 +25,6 @@
 		</fieldset>
 		</form> 
 	</div>
+	<p><a href="/create">Don't have an account? Create now</a>
 </div>
     <?php require_once 'app/views/templates/footer.php' ?>

@@ -29,8 +29,8 @@ class User {
         $statement->bindValue(':name', $username);
         $statement->execute();
         $rows = $statement->fetch(PDO::FETCH_ASSOC);
-		
-		if (password_verify($password, $rows['password'])) {
+    $pass = password_hash($password, PASSWORD_DEFAULT);
+		if (password_verify($pass, $rows['password'])) {
 			$_SESSION['auth'] = 1;
 			$_SESSION['username'] = ucwords($username);
 			unset($_SESSION['failedAuth']);
@@ -45,6 +45,17 @@ class User {
 			header('Location: /login');
 			die;
 		}
+  }
+    public function create($username, $password, $password2){
+        $username = strtolower($username);
+        
+        $password = password_hash($password, PASSWORD_DEFAULT);
+        $password2 = password_hash($password2, PASSWORD_DEFAULT);
+        $db = db_connect();
+        $statement = $db->prepare("insert into users (username, password) values (:username, :password);");
+        $statement->bindValue(':username', $username);
+        $statement->bindValue(':password', $password);
+        $statement->execute();
     }
 
 }
