@@ -1,6 +1,9 @@
 <?php require_once 'app/views/templates/headerPublic.php';
 // Check for authentication errors
 $error = isset($_SESSION['error']) ? $_SESSION['error'] : null;
+$lockoutTime = isset($_SESSION['lockoutTime']) ? $_SESSION['lockoutTime'] : null;
+$remainingTime = ($lockoutTime && time() < $lockoutTime) ? $lockoutTime - time() : 0;
+
 unset($_SESSION['error']); // Clear the error message after displaying
 ?>
 <main role="main" class="container">
@@ -14,6 +17,9 @@ unset($_SESSION['error']); // Clear the error message after displaying
 	<?php if ($error): ?>
 		<div class="alert alert-danger" role="alert">
 				<?php echo htmlspecialchars($error); ?>
+				<?php if ($remainingTime > 0): ?>
+						<p>Please wait for <span id="countdown"><?php echo $remainingTime; ?></span> seconds.</p>
+				<?php endif; ?>
 		</div>
 	<?php endif; ?>
 	
