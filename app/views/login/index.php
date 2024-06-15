@@ -1,4 +1,8 @@
-<?php require_once 'app/views/templates/headerPublic.php'?>
+<?php require_once 'app/views/templates/headerPublic.php';
+// Check for authentication errors
+$error = isset($_SESSION['error']) ? $_SESSION['error'] : null;
+unset($_SESSION['error']); // Clear the error message after displaying
+?>
 <main role="main" class="container">
     <div class="page-header" id="banner">
         <div class="row">
@@ -7,7 +11,12 @@
             </div>
         </div>
     </div>
-
+	<?php if ($error): ?>
+		<div class="alert alert-danger" role="alert">
+				<?php echo htmlspecialchars($error); ?>
+		</div>
+	<?php endif; ?>
+	
 <div class="row">
     <div class="col-sm-auto">
 		<form action="/login/verify" method="post" >
