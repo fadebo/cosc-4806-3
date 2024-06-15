@@ -37,5 +37,6 @@ unset($_SESSION['error']); // Clear the error message after displaying
     </fieldset>
     </form> 
   </div>
+    <p><a href="/login">Already have an account? Login now</a>
 </div>
     <?php require_once 'app/views/templates/footer.php' ?>
