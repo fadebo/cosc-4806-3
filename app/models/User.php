@@ -23,25 +23,49 @@ class User {
          * if username and password good then
          * $this->auth = true;
          */
-		$username = strtolower($username);
-    // Initialize the failed login attempts if not set
-    if (!isset($_SESSION['failedAuth'])) {
-        $_SESSION['failedAuth'] = 0;
-    }
+    
+		// $username = strtolower($username);
+  //   // Initialize the failed login attempts if not set
+  //   if (!isset($_SESSION['failedAuth'])) {
+  //       $_SESSION['failedAuth'] = 0;
+  //   }
 
-    // Initialize the lockout time if not set
-    if (!isset($_SESSION['lockoutTime'])) {
-        $_SESSION['lockoutTime'] = 0;
-    }
-    // Check if the user is currently locked out
-    if (time() < $_SESSION['lockoutTime']) {
+  //   // Initialize the lockout time if not set
+  //   if (!isset($_SESSION['lockoutTime'])) {
+  //       $_SESSION['lockoutTime'] = 0;
+  //   }
+
+    //decided to use the database instead of the session 
+    
+    
+    // // Check if the user is currently locked out
+    // if (time() < $_SESSION['lockoutTime']) {
+    //     $_SESSION['error'] = "Too many failed login attempts. Please try again in 60 seconds.";
+    //     $this->logAttempt($username, 'bad'); // Log the failed attempt
+    //     header('Location: /login');
+    //     exit;
+    // }
+
+		$db = db_connect();
+
+    // Check recent failed attempts
+    $statement = $db->prepare("SELECT COUNT(*) AS failed_attempts, MAX(timestamp) AS last_attempt FROM login_attempts WHERE username = :username AND attempt = 'bad' AND timestamp > (NOW() - INTERVAL 1 MINUTE)");
+    $statement->bindValue(':username', $username);
+    $statement->execute();
+    $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+    $failedAttempts = $result['failed_attempts'];
+    $lastAttempt = strtotime($result['last_attempt']);
+    // Check if the user has exceeded the maximum number of failed attempts
+    if ($failedAttempts >= 3 && (time() - $lastAttempt) < 60) {
+        $_SESSION['lockoutTime'] = $lastAttempt + 60; // Store the lockout end time
         $_SESSION['error'] = "Too many failed login attempts. Please try again in 60 seconds.";
         $this->logAttempt($username, 'bad'); // Log the failed attempt
         header('Location: /login');
         exit;
     }
 
-		$db = db_connect();
+    // Check if the username and password match
     $statement = $db->prepare("select * from users WHERE username = :name;");
     $statement->bindValue(':name', $username);
     $statement->execute();
@@ -58,17 +82,17 @@ class User {
 			die;
 		} else {
       // Incorrect password
-      $_SESSION['failedAuth']++;
-      if ($_SESSION['failedAuth'] >= 3) {
-          $_SESSION['lockoutTime'] = time() + 60; // Set lockout time for 60 seconds
-          $_SESSION['error'] = "Too many failed login attempts. Please try again in 60 seconds.";
-      } else {
+      // $_SESSION['failedAuth']++;
+      // if ($_SESSION['failedAuth'] >= 3) {
+      //     $_SESSION['lockoutTime'] = time() + 60; // Set lockout time for 60 seconds
+      //     $_SESSION['error'] = "Too many failed login attempts. Please try again in 60 seconds.";
+      // } else {
           $_SESSION['error'] = "Incorrect password";
-      }
-      $this->logAttempt($username, 'bad'); // Log the failed attempt
-      //Redirect back to login with error message
-			header('Location: /login');
-			die;
+     // }
+          $this->logAttempt($username, 'bad'); // Log the failed attempt
+          //Redirect back to login with error message
+			     header('Location: /login');
+			     die;
 		}
   }
     public function create($username, $password, $password2){
