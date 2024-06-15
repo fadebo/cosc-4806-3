@@ -36,6 +36,7 @@ class User {
     // Check if the user is currently locked out
     if (time() < $_SESSION['lockoutTime']) {
         $_SESSION['error'] = "Too many failed login attempts. Please try again in 60 seconds.";
+        $this->logAttempt($username, 'bad'); // Log the failed attempt
         header('Location: /login');
         exit;
     }
@@ -52,6 +53,7 @@ class User {
 			$_SESSION['username'] = ucwords($username);
       unset($_SESSION['failedAuth']); // Clear any previous failed attempts
       unset($_SESSION['lockoutTime']); // Clear lockout time
+      $this->logAttempt($username, 'good'); // Log the successful attempt
 			header('Location: /home');
 			die;
 		} else {
@@ -63,6 +65,7 @@ class User {
       } else {
           $_SESSION['error'] = "Incorrect password";
       }
+      $this->logAttempt($username, 'bad'); // Log the failed attempt
       //Redirect back to login with error message
 			header('Location: /login');
 			die;
@@ -130,5 +133,15 @@ class User {
 
       header('Location: /login'); // Redirect back to the login page
     }
+
+  private function logAttempt($username, $attempt) {
+      // Connect to database
+      $db = db_connect();
+      // Prepare and execute SQL query to insert log
+      $statement = $db->prepare("INSERT INTO login_attempts (username, attempt) VALUES (:username, :attempt)");
+      $statement->bindValue(':username', $username);
+      $statement->bindValue(':attempt', $attempt);
+      $statement->execute();
+  }
 
 }
