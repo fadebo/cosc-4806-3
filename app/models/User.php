@@ -24,6 +24,22 @@ class User {
          * $this->auth = true;
          */
 		$username = strtolower($username);
+    // Initialize the failed login attempts if not set
+    if (!isset($_SESSION['failedAuth'])) {
+        $_SESSION['failedAuth'] = 0;
+    }
+
+    // Initialize the lockout time if not set
+    if (!isset($_SESSION['lockoutTime'])) {
+        $_SESSION['lockoutTime'] = 0;
+    }
+    // Check if the user is currently locked out
+    if (time() < $_SESSION['lockoutTime']) {
+        $_SESSION['error'] = "Too many failed login attempts. Please try again in 60 seconds.";
+        header('Location: /login');
+        exit;
+    }
+
 		$db = db_connect();
     $statement = $db->prepare("select * from users WHERE username = :name;");
     $statement->bindValue(':name', $username);
@@ -34,18 +50,20 @@ class User {
       //Password is correct
 			$_SESSION['auth'] = 1;
 			$_SESSION['username'] = ucwords($username);
-			unset($_SESSION['failedAuth']);
+      unset($_SESSION['failedAuth']); // Clear any previous failed attempts
+      unset($_SESSION['lockoutTime']); // Clear lockout time
 			header('Location: /home');
 			die;
 		} else {
-      //Incorrect Password
-			if(isset($_SESSION['failedAuth'])) {
-				$_SESSION['failedAuth'] ++; //increment
-			} else {
-				$_SESSION['failedAuth'] = 1;
-			}
+      // Incorrect password
+      $_SESSION['failedAuth']++;
+      if ($_SESSION['failedAuth'] >= 3) {
+          $_SESSION['lockoutTime'] = time() + 60; // Set lockout time for 60 seconds
+          $_SESSION['error'] = "Too many failed login attempts. Please try again in 60 seconds.";
+      } else {
+          $_SESSION['error'] = "Incorrect password";
+      }
       //Redirect back to login with error message
-      $_SESSION['error'] = "Incorrect password";
 			header('Location: /login');
 			die;
 		}
