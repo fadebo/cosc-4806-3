@@ -13,6 +13,48 @@ if (!isset($_SESSION['auth'])) {
         <meta name="viewport" content="width=device-width">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="mobile-web-app-capable" content="yes">
+      <style>
+          body {
+              background-color: black;
+              color: white;
+              
+          }
+        a {
+            color: red;
+        }
+        a:hover {
+            color: darkred;
+        }
+          .navbar-light .navbar-nav .nav-link,
+          .navbar-light .navbar-brand,
+          .navbar-light .navbar-toggler {
+              color: grey;
+          }
+          .navbar-light .navbar-nav .nav-link.active,
+          .navbar-light .navbar-nav .nav-link:hover,
+          .navbar-light .navbar-brand:hover {
+              color: red;
+          }
+          .btn {
+              background-color: red;
+              color: white;
+              border-color: red;
+          }
+          .btn:hover {
+              background-color: darkred;
+              border-color: darkred;
+          }
+          .dropdown-menu {
+              background-color: grey;
+          }
+          .dropdown-menu .dropdown-item {
+              color: white;
+          }
+          .dropdown-menu .dropdown-item:hover {
+              background-color: red;
+              color: white;
+          }
+      </style>
     </head>
     <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
