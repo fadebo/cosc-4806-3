@@ -18,7 +18,7 @@ class User {
       return $rows;
     }
 
-    public function authenticate($username, $password) {
+  public function authenticate($username, $password) {
         /*
          * if username and password good then
          * $this->auth = true;
@@ -29,8 +29,8 @@ class User {
     $statement->bindValue(':name', $username);
     $statement->execute();
     $rows = $statement->fetch(PDO::FETCH_ASSOC);
-    $pass = password_hash($password, PASSWORD_DEFAULT);
-		if (password_verify($pass, $rows['password'])) {
+   // $pass = password_hash($password, PASSWORD_DEFAULT);
+		if (password_verify($password, $rows['password'])) {
       //Password is correct
 			$_SESSION['auth'] = 1;
 			$_SESSION['username'] = ucwords($username);

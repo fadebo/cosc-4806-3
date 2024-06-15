@@ -18,7 +18,7 @@ unset($_SESSION['error']); // Clear the error message after displaying
     <?php endif; ?>
 <div class="row">
     <div class="col-sm-auto">
-    <form action="/create/account" method="post" >
+    <form action="/create/action" method="post" >
     <fieldset>
       <div class="form-group">
         <label for="username">Username</label>
